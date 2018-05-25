@@ -4,6 +4,7 @@ import math
 # Power management registers
 power_mgmt_1 = 0x6b
 power_mgmt_2 = 0x6c
+a =1
 
 def read_byte(adr):
     return bus.read_byte_data(address, adr)
