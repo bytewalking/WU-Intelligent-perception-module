@@ -1,4 +1,4 @@
-import smbus
+import smbus # 此模块要在树莓派上安装测试
 import math
 
 # Power management registers

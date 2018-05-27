@@ -1,5 +1,5 @@
 """超声波模块"""
-import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO # 此模块要在树莓派上安装测试
 import time
 
 class Gyroscope:
