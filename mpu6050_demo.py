@@ -42,10 +42,12 @@ def gyroPrint():
     #绕Z轴旋转的角速度GYR_Z 
     gyro_zout = read_word_2c(0x47)
 
-    print "----------------角速度计--------------------"
-    print "x轴角速度：",1000*gyro_xout/32768
-    print "y轴角速度：",1000*gyro_yout/32768
-    print "z轴角速度：",1000*gyro_zout/32768
+    print("----------------角速度计--------------------")
+    print("x轴角速度：", 1000 * gyro_xout / 32768)
+    print("y轴角速度：", 1000 * gyro_yout / 32768)
+    print("z轴角速度：", 1000 * gyro_zout / 32768)
+
+
 '''
     print "gyro data"
     print "---------"
@@ -70,11 +72,13 @@ def accelerometerPrint():
     accel_yout_scaled = accel_yout / 16384.0
     accel_zout_scaled = accel_zout / 16384.0
 
-    print "----------------加速度计--------------------"
-    print "温度：",accel_temperature
-    print "x轴加速度：",4*9.8*accel_xout/32768
-    print "y轴加速度：",4*9.8*accel_yout/32768
-    print "z轴加速度：",4*9.8*accel_zout/32768
+    print("----------------加速度计--------------------")
+    print("温度：", accel_temperature)
+    print("x轴加速度：", 4 * 9.8 * accel_xout / 32768)
+    print("y轴加速度：", 4 * 9.8 * accel_yout / 32768)
+    print("z轴加速度：", 4 * 9.8 * accel_zout / 32768)
+
+
 '''
     print "accel_xout: ", accel_xout, " scaled: ", accel_xout_scaled
     print "accel_yout: ", accel_yout, " scaled: ", accel_yout_scaled
@@ -113,6 +117,6 @@ bus.write_byte_data(address, 0x1C, ACCEL_CONFIG | (AFS_SEL<<3))
 i=0
 while (i<10):
     gyroPrint()
-    print "------------------------------------------"
+    print("------------------------------------------")
     accelerometerPrint()
     i+=1
