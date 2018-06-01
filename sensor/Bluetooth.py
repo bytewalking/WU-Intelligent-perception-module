@@ -8,7 +8,7 @@ class Bluetooth:
         pass
 
     def fixed_point(self,xc,ya,yc,r1,r2,r3):
-        """定位计算模块    xa  xb  yb  均为0"""
+        """定位计算模块，好奇下面俩式子从哪儿来的，在我草稿本上，(＾－＾)V，xa  xb  yb  均为0"""
         yd=(r1**2-r3**2+ya**2)/2*ya
         xd=(r1**2-r2**2+xc**2+yc**2-2*yd*yc)/2*xc
         return xd,yd
