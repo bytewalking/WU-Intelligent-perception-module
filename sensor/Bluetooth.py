@@ -72,7 +72,8 @@ class Bluetooth:
            把高斯滤波后的数值取平滑"""
         gaussion_smoothing_filter=[]
         for i in range(len(rssi)-1):
-            gaussion_smoothing_filter=gaussion_smoothing_filter.append(x1+(rssi[i]-x1)/len(rssi))
+            gaussion_smoothing_filter = gaussion_smoothing_filter.append(x1+(rssi[i]-x1)/len(rssi))
+            x1 = gaussion_smoothing_filter[i]
         return gaussion_smoothing_filter
 
 
