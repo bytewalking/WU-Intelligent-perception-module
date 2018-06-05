@@ -17,12 +17,14 @@ class Bluetooth:
         yd = (r1**2-r3**2+ya**2)/2*ya
         xd = (r1**2-r2**2+xc**2+yc**2-2*yd*yc)/2*xc
         return xd,yd
+
     def RSSI_distance(self,rssi,A,N):
         """蓝牙RSSI计算距离"""
         d = 10**((abs(rssi)-A)/10*N)
         """ A为发射端和接收端相隔一米时的信号强度
             N为环境衰减因子"""
         return d
+
     def CSYS (self,xd,yd,xc,ya,yc):
         """直角坐标系建系及绘图，xd,yd 可以直接传数组"""
         plt.plot(xc, yc, 'or-')
@@ -31,6 +33,7 @@ class Bluetooth:
         plt.figure()
         plt.plot(xd, yd,'xb-')
         plt.show()
+
     def coordinate_system_data (self,distance):
         """探测坐标数据归类"""
         global xd
@@ -51,11 +54,12 @@ class Bluetooth:
             #time.sleep(3)#睡眠时间自定义
             scanner.stop()
             return data
-    def Gaussion_filter(self,RSSI):
+
+    def Gaussion_filter(self,RSSI): #lists为存放多个节点rssi强度的列表
         """高斯滤波算法"""
-        rssi = 0
         gaussion_filter_num = []
         """均值"""
+        rssi=0
         add = sum(RSSI)
         ave = add/len(RSSI)
         """标准差"""
@@ -64,10 +68,11 @@ class Bluetooth:
         standard_deviation = math.sqrt( rssi/len(RSSI) )
         """高斯滤波"""
         for j in range(len(RSSI)-1):
-            gaussion_filter_num = gaussion_filter_num.append((1/math.sqrt(2*math.pi)*standard_deviation)*math.exp(-(RSSI[j]/ave)**2/2*(standard_deviation**2)))
+            value=1 / (math.sqrt(2*math.pi)*standard_deviation) * math.exp((-(RSSI[j]-ave)**2)/2*(standard_deviation**2))
+            gaussion_filter_num.append(value)
         return gaussion_filter_num
 
-    def Gaussion_Smoothing_filter(self,rssi,x1):
+    def Gaussion_Smoothing_filter(self,rssi):
         """基于高斯滤波的平滑滤波，看情况选用
            把高斯滤波后的数值取平滑"""
         gaussion_smoothing_filter=[]
@@ -75,16 +80,22 @@ class Bluetooth:
             gaussion_smoothing_filter=gaussion_smoothing_filter.append(x1+(rssi[i]-x1)/len(rssi))
         return gaussion_smoothing_filter
 
+    data = bluetooch_data()
+    RSSIa = []
+    RSSIb = []
+    RSSIc = []
+    #将rssi值与mac地址分开
+    for rssi in data.values():
+        for add in data.keys():
+            if add == u'10:01:12:ee:57:54':
+                RSSIa.append(rssi)
+            elif add == u'20:01:14:9c:57:54':
+                RSSIb.append(rssi)
+            else:
+                RSSIc.append(rssi)
 
     xd = []
     yd = []
-    data = bluetooch_data()
-    RSSIa = []
-    RSSIa = RSSIa.append(data[Amac])#Amac待定
-    RSSIb = []
-    RSSIb = RSSIb.append(data[Bmac])#Bmac待定
-    RSSIc = []
-    RSSIc = RSSIc.append(data[Cmac])#Cmac待定
     distance = fixed_point(xc,ya,yc,r1,r2,r3)
     coordinate_system_data(distance)
     CSYS(xd, yd, xc, ya, yc)
