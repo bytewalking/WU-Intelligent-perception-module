@@ -42,12 +42,13 @@ class Bluetooth:
         yd.append(distance[1])
     def bluetooch_data(self):
         """蓝牙模块初始化传入参数"""
-        global data
-        data = {}
+        #global data
+        #data = {}
         def callback(bt_addr, rssi, packet, additional_info):
-            data[bt_addr] = rssi
-        #   print ("<%s, %d> %s %s" % (bt_addr, rssi, packet, additional_info))
+        data[bt_addr] = rssi
+        #print ("<%s, %d> %s %s" % (bt_addr, rssi, packet, additional_info))
         # scan for all iBeacon advertisements from beacons with the specified uuid
+
         while (1):
             scanner = BeaconScanner(callback)
             scanner.start()
@@ -70,30 +71,31 @@ class Bluetooth:
         for j in range(len(RSSI)-1):
             value=1 / (math.sqrt(2*math.pi)*standard_deviation) * math.exp((-(RSSI[j]-ave)**2)/2*(standard_deviation**2))
             gaussion_filter_num.append(value)
-        return gaussion_filter_num
+        gaussion_ave=sum(gaussion_filter_num)/len(gaussion_filter_num)
+        return gaussion_ave
 
-    def Gaussion_Smoothing_filter(self,rssi):
-        """基于高斯滤波的平滑滤波，看情况选用
-           把高斯滤波后的数值取平滑"""
-        gaussion_smoothing_filter=[]
-        for i in range(len(rssi)-1):
-            gaussion_smoothing_filter = gaussion_smoothing_filter.append(x1+(rssi[i]-x1)/len(rssi))
-            x1 = gaussion_smoothing_filter[i]
-        return gaussion_smoothing_filter
-
-    data = bluetooch_data()
-    RSSIa = []
-    RSSIb = []
-    RSSIc = []
-    #将rssi值与mac地址分开
-    for rssi in data.values():
-        for add in data.keys():
-            if add == u'10:01:12:ee:57:54':
-                RSSIa.append(rssi)
-            elif add == u'20:01:14:9c:57:54':
-                RSSIb.append(rssi)
-            else:
-                RSSIc.append(rssi)
+    def add(self):
+        data = bluetooch_data()
+        RSSIa = []
+        RSSIb = []
+        RSSIc = []
+        #将rssi值与mac地址分开
+        for rssi in data.values():
+            for add in data.keys():
+                if add == u'10:01:12:ee:57:54':
+                    RSSIa.append(rssi)
+                elif add == u'20:01:14:9c:57:54':
+                    RSSIb.append(rssi)
+                else:
+                    RSSIc.append(rssi)
+        if len(RSSIa)==20 and len(RSSIb)==20 and len(RSSIc)==20 :
+            scanner.stop()
+        ra = Gaussion_filter(RSSIa)
+        rb = Gaussion_filter(RSSIb)
+        rc = Gaussion_filter(RSSIc)
+        RSSI_distance(ra, 47, 1.7)
+        RSSI_distance(rb, 47, 1.7)
+        RSSI_distance(rc, 47, 1.7)
 
     xd = []
     yd = []
