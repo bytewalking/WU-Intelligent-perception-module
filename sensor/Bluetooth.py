@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import time
 import math
 import numpy as np
-
 from beacontools import BeaconScanner
 class Bluetooth():
     def __init__(self):
@@ -50,7 +49,8 @@ class Bluetooth():
         data = {}
 
         def callback(bt_addr, rssi, packet, additional_info):
-            print ("<%s, %d> %s %s" % (bt_addr, rssi, packet, additional_info))
+            data[bt_addr] = rssi
+            # print ("<%s, %d> %s %s" % (bt_addr, rssi ,packet, additional_info))
             # scan for all iBeacon advertisements from beacons with the specified uuid
 
         while (1):
@@ -73,7 +73,8 @@ class Bluetooth():
         standard_deviation = math.sqrt( rssi/len(RSSI) )
         """高斯滤波"""
         for j in range(len(RSSI)-1):
-            value=1 / (math.sqrt(2*math.pi)*standard_deviation) * math.exp((-(RSSI[j]-ave)**2)/2*(standard_deviation**2))
+            value = ((math.exp((-((RSSI[j] - ave) ** 2) / (2 * standard_deviation ** 2)))) / standard_deviation * (
+                math.sqrt(2 * math.pi)))
             gaussion_filter_num.append(value)
         gaussion_ave=sum(gaussion_filter_num)/len(gaussion_filter_num)
         return gaussion_ave
