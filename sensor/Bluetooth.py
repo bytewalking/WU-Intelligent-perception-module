@@ -77,29 +77,33 @@ class Bluetooth():
         return gaussion_ave
 
     def add(self):
-        data = self.bluetooch_data()
-        RSSIa = []
-        RSSIb = []
-        RSSIc = []
-        #将rssi值与mac地址分开
-        for rssi in data.values():
-            for add in data.keys():
-                if add == u'10:01:12:ee:57:54':
-                    RSSIa.append(rssi)
-                elif add == u'20:01:14:9c:57:54':
-                    RSSIb.append(rssi)
-                else:
-                    RSSIc.append(rssi)
-        if len(RSSIa)==20 and len(RSSIb)==20 and len(RSSIc)==20 :
-            self.scanner.stop()
-        ra = self.Gaussion_filter(RSSIa)
-        rb = self.Gaussion_filter(RSSIb)
-        rc = self.Gaussion_filter(RSSIc)
-        r3 = self.RSSI_distance(ra, 47, 1.7)
-        r1 = self.RSSI_distance(rb, 47, 1.7)
-        r2 = self.RSSI_distance(rc, 47, 1.7)
-        coordinate_D = self.fixed_point(self.xc,self.ya,self.yc,r1,r2,r3)
-        self.coordinate_system_data(coordinate_D)
+        while( 1 ):
+            data = self.bluetooch_data()
+            RSSIa = []
+            RSSIb = []
+            RSSIc = []
+            #将rssi值与mac地址分开
+            for rssi in data.values():
+                for add in data.keys():
+                    if add == u'10:01:12:ee:57:54':
+                        RSSIa.append(rssi)
+                    elif add == u'20:01:14:9c:57:54':
+                        RSSIb.append(rssi)
+                    else:
+                        RSSIc.append(rssi)
+            if len(RSSIa)==20 and len(RSSIb)==20 and len(RSSIc)==20 :
+                self.scanner.stop()
+            ra = self.Gaussion_filter(RSSIa)
+            rb = self.Gaussion_filter(RSSIb)
+            rc = self.Gaussion_filter(RSSIc)
+            r3 = self.RSSI_distance(ra, 47, 1.7)
+            r1 = self.RSSI_distance(rb, 47, 1.7)
+            r2 = self.RSSI_distance(rc, 47, 1.7)
+            coordinate_D = self.fixed_point(self.xc,self.ya,self.yc,r1,r2,r3)
+            self.coordinate_system_data(coordinate_D)
+            del RSSIa[:]
+            del RSSIb[:]
+            del RSSIc[:]
 
 
     xd = []
