@@ -2,6 +2,8 @@
 import matplotlib.pyplot as plt
 import time
 import math
+import numpy as np
+
 from beacontools import BeaconScanner
 class Bluetooth():
     def __init__(self):
@@ -105,6 +107,7 @@ class Bluetooth():
             del RSSIb[:]
             del RSSIc[:]
 
-
-    xd = []
-    yd = []
+test = Bluetooth()
+xd = []
+yd = []
+test.add()
