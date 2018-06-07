@@ -102,7 +102,7 @@ class Bluetooth():
                         RSSIb.append(rssi)
                     else:
                         RSSIc.append(rssi)
-            if len(RSSIa)==20 and len(RSSIb)==20 and len(RSSIc)==20 :
+            if len(RSSIa) == 20 and len(RSSIb) == 20 and len(RSSIc) == 20:
                 self.scanner.stop()
             ra = self.Gaussion_filter(RSSIa)
             rb = self.Gaussion_filter(RSSIb)
