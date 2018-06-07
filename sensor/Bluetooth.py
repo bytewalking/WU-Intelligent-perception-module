@@ -31,8 +31,10 @@ class Bluetooth():
         plt.plot(xc, yc, 'or-')
         plt.plot(0, 0, 'or-')
         plt.plot(0, ya, 'or-')
+        plt.plot(xd, yd , 'xb')
+        for i in range(len(xd)-2):
+            plt.annotate("", xytext=(xd[i], yd[i]), textcoords='data', xy=(xd[i + 1], yd[i + 1]), xycoords='data',arrowprops=dict(arrowstyle="->", connectionstyle="arc3", ec='y'))
         plt.figure()
-        plt.plot(xd, yd,'xb-')
         plt.show()
 
     def coordinate_system_data (self,distance):
@@ -73,10 +75,16 @@ class Bluetooth():
         standard_deviation = math.sqrt( rssi/len(RSSI) )
         """高斯滤波"""
         for j in range(len(RSSI)-1):
-            value = ((math.exp((-((RSSI[j] - ave) ** 2) / (2 * standard_deviation ** 2)))) / standard_deviation * (
-                math.sqrt(2 * math.pi)))
-            gaussion_filter_num.append(value)
-        gaussion_ave=sum(gaussion_filter_num)/len(gaussion_filter_num)
+            value = ((math.exp((-((RSSI[j] - ave) ** 2) / (2 * standard_deviation ** 2)))) / standard_deviation * (math.sqrt(2 * math.pi)))
+            upper_limit = ave+value*standard_deviation
+            lower_limit = ave-value*standard_deviation
+            if upper_limit > RSSI[j] and lower_limit<RSSI[j]:
+                gaussion_filter_num.append(RSSI[j])
+            elif upper_limit < RSSI[j]:
+                gaussion_filter_num.append(upper_limit)
+            else:
+                gaussion_filter_num.append(lower_limit)
+        gaussion_ave = sum(gaussion_filter_num)/len(gaussion_filter_num)
         return gaussion_ave
 
     def add(self):
