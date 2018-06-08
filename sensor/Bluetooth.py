@@ -46,11 +46,11 @@ class Bluetooth():
         global yd
         xd.append(distance[0])
         yd.append(distance[1])
-        self.CSYS(xd,yd,self.xc,self.ya,self.yc)
+        self.CSYS(xd, yd, self.xc, self.ya, self.yc)
 
-   # def callback(bt_addr, rssi, packet, additional_info):
+    def callback(bt_addr, rssi, packet, additional_info):
         """蓝牙模块初始化传入参数"""
-        #data[bt_addr] = rssi
+        data[bt_addr] = rssi
         #print ("<%s, %d># %s %s" % (bt_addr, rssi ,packet, additional_info))
         #scan for all iBeacon advertisements from beacons with the specified uuid
 
@@ -89,7 +89,7 @@ RSSIc = []
 while( 1 ):
     #scanner.start()
     #将rssi值与mac地址分开
-    flag=1
+    flag = 1
     while(flag):
         for add in data.keys():
             if add == u'10:01:12:ee:57:54':
@@ -98,8 +98,8 @@ while( 1 ):
                 RSSIb.append(data[add])
             else:
                 RSSIc.append(data[add])
-            if len(RSSIa)>=20 and len(RSSIb)>=20 and len(RSSIc)>=20:
-                flag=0
+            if len(RSSIa) >= 20 and len(RSSIb) >= 20 and len(RSSIc) >= 20:
+                flag = 0
                 #test.scanner.stop()
     ra = test.Gaussion_filter(RSSIa)
     rb = test.Gaussion_filter(RSSIb)
