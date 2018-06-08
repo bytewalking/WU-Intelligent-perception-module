@@ -45,22 +45,11 @@ class Bluetooth():
         yd.append(distance[1])
         self.CSYS(xd,yd,self.xc,self.ya,self.yc)
 
-    def bluetooch_data(self):
+    def callback(bt_addr, rssi, packet, additional_info):
         """蓝牙模块初始化传入参数"""
-        global data
-        data = {}
-
-        def callback(bt_addr, rssi, packet, additional_info):
-            data[bt_addr] = rssi
-            # print ("<%s, %d> %s %s" % (bt_addr, rssi ,packet, additional_info))
-            # scan for all iBeacon advertisements from beacons with the specified uuid
-
-        while (1):
-            scanner = BeaconScanner(callback)
-            scanner.start()
-            #time.sleep(3)#睡眠时间自定义
-            scanner.stop()
-            return data
+        data[bt_addr] = rssi
+        # print ("<%s, %d># %s %s" % (bt_addr, rssi ,packet, additional_info))
+        #scan for all iBeacon advertisements from beacons with the specified uuid
 
     def Gaussion_filter(self,RSSI): #lists为存放多个节点rssi强度的列表
         """高斯滤波算法"""
@@ -87,36 +76,38 @@ class Bluetooth():
         gaussion_ave = sum(gaussion_filter_num)/len(gaussion_filter_num)
         return gaussion_ave
 
-    def add(self):
-        while( 1 ):
-            data = self.bluetooch_data()
-            RSSIa = []
-            RSSIb = []
-            RSSIc = []
-            #将rssi值与mac地址分开
-            for rssi in data.values():
-                for add in data.keys():
-                    if add == u'10:01:12:ee:57:54':
-                        RSSIa.append(rssi)
-                    elif add == u'20:01:14:9c:57:54':
-                        RSSIb.append(rssi)
-                    else:
-                        RSSIc.append(rssi)
-            if len(RSSIa)==20 and len(RSSIb)==20 and len(RSSIc)==20 :
-                self.scanner.stop()
-            ra = self.Gaussion_filter(RSSIa)
-            rb = self.Gaussion_filter(RSSIb)
-            rc = self.Gaussion_filter(RSSIc)
-            r3 = self.RSSI_distance(ra, 47, 1.7)
-            r1 = self.RSSI_distance(rb, 47, 1.7)
-            r2 = self.RSSI_distance(rc, 47, 1.7)
-            coordinate_D = self.fixed_point(self.xc,self.ya,self.yc,r1,r2,r3)
-            self.coordinate_system_data(coordinate_D)
-            del RSSIa[:]
-            del RSSIb[:]
-            del RSSIc[:]
 
+global data
+data = {}
 test = Bluetooth()
-xd = []
-yd = []
-test.add()
+RSSIa = []
+RSSIb = []
+RSSIc = []
+while( 1 ):
+    scanner = BeaconScanner(callback)
+    scanner.start()
+    #将rssi值与mac地址分开
+    for add in data.keys():
+        if add == u'10:01:12:ee:57:54':
+            RSSIa.append(data[add])
+        elif add == u'20:01:14:9c:57:54':
+            RSSIb.append(data[add])
+        else:
+            RSSIc.append(data[add])
+        if len(RSSIa)==20 and len(RSSIb)==20 and len(RSSIc)==20 :
+            self.scanner.stop()
+    ra = self.Gaussion_filter(RSSIa)
+    rb = self.Gaussion_filter(RSSIb)
+    rc = self.Gaussion_filter(RSSIc)
+    r3 = self.RSSI_distance(ra, 47, 1.7)
+    r1 = self.RSSI_distance(rb, 47, 1.7)
+    r2 = self.RSSI_distance(rc, 47, 1.7)
+    coordinate_D = self.fixed_point(self.xc,self.ya,self.yc,r1,r2,r3)
+    self.coordinate_system_data(coordinate_D)
+    xd = []
+    yd = []
+    del RSSIa[:]
+    del RSSIb[:]
+    del RSSIc[:]
+    data.clear()
+
