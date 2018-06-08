@@ -94,14 +94,13 @@ class Bluetooth():
             RSSIb = []
             RSSIc = []
             #将rssi值与mac地址分开
-            for rssi in data.values():
-                for add in data.keys():
-                    if add == u'10:01:12:ee:57:54':
-                        RSSIa.append(rssi)
-                    elif add == u'20:01:14:9c:57:54':
-                        RSSIb.append(rssi)
-                    else:
-                        RSSIc.append(rssi)
+            for add in data.keys():
+                if add == u'10:01:12:ee:57:54':
+                    RSSIa.append(data[add])
+                elif add == u'20:01:14:9c:57:54':
+                    RSSIb.append(data[add])
+                else:
+                    RSSIc.append(data[add])
             if len(RSSIa) == 20 and len(RSSIb) == 20 and len(RSSIc) == 20:
                 self.scanner.stop()
             ra = self.Gaussion_filter(RSSIa)
