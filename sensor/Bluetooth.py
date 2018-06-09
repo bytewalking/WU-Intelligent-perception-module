@@ -91,8 +91,9 @@ while( 1 ):
     #scanner.start()
     #将rssi值与mac地址分开
     flag = 1
-    while(flag):
+    while( flag ):
         scanner = test.bluetooch_data(test.callback)
+        """传入参数     待改正"""
         print(scanner)
         for add in data.keys():
             if add == u'10:01:12:ee:57:54':
@@ -103,7 +104,7 @@ while( 1 ):
                 RSSIc.append(data[add])
                 #print(len(RSSIc))
                 #print(RSSIc)
-        if len(RSSIa) == 20 :
+        if len(RSSIa) == 20:
             flag = 0
                 #test.scanner.stop()
     ra = test.Gaussion_filter(RSSIa)
