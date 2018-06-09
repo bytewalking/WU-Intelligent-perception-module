@@ -81,8 +81,9 @@ class Bluetooth():
 
 
 test = Bluetooth()
-global data
 data = {}
+xd = []
+yd = []
 RSSIa = []
 RSSIb = []
 RSSIc = []
@@ -91,6 +92,8 @@ while( 1 ):
     #将rssi值与mac地址分开
     flag = 1
     while(flag):
+        scanner = test.bluetooch_data(test.callback)
+        print(scanner)
         for add in data.keys():
             if add == u'10:01:12:ee:57:54':
                 RSSIa.append(data[add])
@@ -98,19 +101,26 @@ while( 1 ):
                 RSSIb.append(data[add])
             else:
                 RSSIc.append(data[add])
-            if len(RSSIa) >= 20 and len(RSSIb) >= 20 and len(RSSIc) >= 20:
-                flag = 0
+                #print(len(RSSIc))
+                #print(RSSIc)
+        if len(RSSIa) == 20 :
+            flag = 0
                 #test.scanner.stop()
     ra = test.Gaussion_filter(RSSIa)
     rb = test.Gaussion_filter(RSSIb)
     rc = test.Gaussion_filter(RSSIc)
+    # print(ra)
+    # print(rb)
+    # print(rc)
     r3 = test.RSSI_distance(ra, 47, 1.7)
     r1 = test.RSSI_distance(rb, 47, 1.7)
     r2 = test.RSSI_distance(rc, 47, 1.7)
+    # print (r1)
+    # print (r2)
+    # print (r3)
     coordinate_D = test.fixed_point(test.xc,test.ya,test.yc,r1,r2,r3)
+    #print (coordinate_D)
     test.coordinate_system_data(coordinate_D)
-    xd = []
-    yd = []
     del RSSIa[:]
     del RSSIb[:]
     del RSSIc[:]
