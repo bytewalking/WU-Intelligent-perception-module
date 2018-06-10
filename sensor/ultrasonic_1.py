@@ -27,8 +27,8 @@ def dis():  # 测距函数
     elapsed = stop - start  # 计算一共花费多长时间
     distance = elapsed * 34300  # 计算距离，就是时间乘以声速
     distance = distance / 2  # 除以2得到一次的距离而不是来回的距离
-    print "Distance : %.1fcm" % distance
-
+    #print "Distance : %.1fcm" % distance
+    print(float(distance))
 try:  # 用于捕捉异常
     while True:
         dis()  # 调用测距函数
