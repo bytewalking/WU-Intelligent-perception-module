@@ -10,11 +10,11 @@ def scan_base(bt_addr, rssi, packet, additional_info):
 class Bluetooth():
     def __init__(self):
         """初始化蓝牙模块"""
-        self.A = int(input("请输发射端和接收端相隔一米时的信号强度，建议程序内部设置"))
-        self.N = int(input("环境衰减因子,建议程序内部设置值"))
-        self.xc = int(input("请输入xc的值"))
-        self.yc = int(input("请输入yc的值"))
-        self.ya = int(input("请输入ya的值"))
+        self.A = 47
+        self.N = 1.7
+        self.xc = 20
+        self.yc = 20
+        self.ya = 40
 
     def fixed_point(self,xc,ya,yc,r1,r2,r3):
         """定位计算模块,r1为BD距离，r2为DC距离，r3为AD距离"""
@@ -22,9 +22,9 @@ class Bluetooth():
         xd = (r1**2-r2**2+xc**2+yc**2-2*yd*yc)/2*xc
         return xd, yd
 
-    def RSSI_distance(self,rssi,A,N):
+    def RSSI_distance(self,rssi):
         """蓝牙RSSI计算距离"""
-        r = 10**((abs(rssi)-A)/10*N)
+        r = 10**((abs(rssi)-self.A)/10*self.N)
         """ A为发射端和接收端相隔一米时的信号强度
             N为环境衰减因子"""
         return r
@@ -88,13 +88,12 @@ RSSIa = []
 RSSIb = []
 RSSIc = []
 while( 1 ):
-    #scanner.start()
+    scanner = BeaconScanner(callable())
+    scanner.start()
     #将rssi值与mac地址分开
     flag = 1
     while( flag ):
-        scanner = test.bluetooch_data(test.callback)
         """传入参数     待改正"""
-        print(scanner)
         for add in data.keys():
             if add == u'10:01:12:ee:57:54':
                 RSSIa.append(data[add])
@@ -106,16 +105,16 @@ while( 1 ):
                 #print(RSSIc)
         if len(RSSIa) == 20:
             flag = 0
-                #test.scanner.stop()
+            scanner.stop()
     ra = test.Gaussion_filter(RSSIa)
     rb = test.Gaussion_filter(RSSIb)
     rc = test.Gaussion_filter(RSSIc)
     # print(ra)
     # print(rb)
     # print(rc)
-    r3 = test.RSSI_distance(ra, 47, 1.7)
-    r1 = test.RSSI_distance(rb, 47, 1.7)
-    r2 = test.RSSI_distance(rc, 47, 1.7)
+    r3 = test.RSSI_distance(ra)
+    r1 = test.RSSI_distance(rb)
+    r2 = test.RSSI_distance(rc)
     # print (r1)
     # print (r2)
     # print (r3)
