@@ -5,7 +5,7 @@ import math
 import numpy as np
 from beacontools import BeaconScanner
 def scan_base(bt_addr, rssi, packet, additional_info):
-    print ("<%s, %d> %s %s" % (bt_addr, rssi, packet, additional_info))
+    data[bt_addr] = rssi
 
 class Bluetooth():
     def __init__(self):
@@ -31,14 +31,15 @@ class Bluetooth():
 
     def CSYS (self,xd,yd,xc,ya,yc):
         """直角坐标系建系及绘图，xd,yd 可以直接传数组"""
+        plt.figure()
         plt.plot(xc, yc, 'or-')
         plt.plot(0, 0, 'or-')
         plt.plot(0, ya, 'or-')
         plt.plot(xd, yd , 'xb')
         for i in range(len(xd)-2):
             plt.annotate("", xytext=(xd[i], yd[i]), textcoords='data', xy=(xd[i + 1], yd[i + 1]), xycoords='data',arrowprops=dict(arrowstyle="->", connectionstyle="arc3", ec='y'))
-        plt.figure()
         plt.show()
+
 
     def coordinate_system_data (self,distance):
         """探测坐标数据归类"""
@@ -48,11 +49,11 @@ class Bluetooth():
         yd.append(distance[1])
         self.CSYS(xd, yd, self.xc, self.ya, self.yc)
 
-    def callback(bt_addr, rssi, packet, additional_info):
-        """蓝牙模块初始化传入参数"""
-        data[bt_addr] = rssi
-        #print ("<%s, %d># %s %s" % (bt_addr, rssi ,packet, additional_info))
-        #scan for all iBeacon advertisements from beacons with the specified uuid
+    # def callback(bt_addr, rssi, packet, additional_info):
+    #     """蓝牙模块初始化传入参数"""
+    #     data[bt_addr] = rssi
+    #     #print ("<%s, %d># %s %s" % (bt_addr, rssi ,packet, additional_info))
+    #     #scan for all iBeacon advertisements from beacons with the specified uuid
 
     def Gaussion_filter(self,RSSI): #lists为存放多个节点rssi强度的列表
         """高斯滤波算法"""
@@ -88,7 +89,7 @@ RSSIa = []
 RSSIb = []
 RSSIc = []
 while( 1 ):
-    scanner = BeaconScanner(callable())
+    scanner = BeaconScanner(scan_base)
     scanner.start()
     #将rssi值与mac地址分开
     flag = 1
