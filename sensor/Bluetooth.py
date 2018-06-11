@@ -5,7 +5,7 @@ import math
 import numpy as np
 from beacontools import BeaconScanner
 def scan_base(bt_addr, rssi, packet, additional_info):
-    print ("<%s, %d> %s %s" % (bt_addr, rssi, packet, additional_info))
+    data[bt_addr] = rssi
 
 class Bluetooth():
     def __init__(self):
@@ -31,14 +31,15 @@ class Bluetooth():
 
     def CSYS (self,xd,yd,xc,ya,yc):
         """直角坐标系建系及绘图，xd,yd 可以直接传数组"""
+        plt.figure()
         plt.plot(xc, yc, 'or-')
         plt.plot(0, 0, 'or-')
         plt.plot(0, ya, 'or-')
         plt.plot(xd, yd , 'xb')
         for i in range(len(xd)-2):
             plt.annotate("", xytext=(xd[i], yd[i]), textcoords='data', xy=(xd[i + 1], yd[i + 1]), xycoords='data',arrowprops=dict(arrowstyle="->", connectionstyle="arc3", ec='y'))
-        plt.figure()
         plt.show()
+
 
     def coordinate_system_data (self,distance):
         """探测坐标数据归类"""
@@ -48,11 +49,11 @@ class Bluetooth():
         yd.append(distance[1])
         self.CSYS(xd, yd, self.xc, self.ya, self.yc)
 
-    def callback(bt_addr, rssi, packet, additional_info):
-        """蓝牙模块初始化传入参数"""
-        data[bt_addr] = rssi
-        #print ("<%s, %d># %s %s" % (bt_addr, rssi ,packet, additional_info))
-        #scan for all iBeacon advertisements from beacons with the specified uuid
+    # def callback(bt_addr, rssi, packet, additional_info):
+    #     """蓝牙模块初始化传入参数"""
+    #     data[bt_addr] = rssi
+    #     #print ("<%s, %d># %s %s" % (bt_addr, rssi ,packet, additional_info))
+    #     #scan for all iBeacon advertisements from beacons with the specified uuid
 
     def Gaussion_filter(self,RSSI): #lists为存放多个节点rssi强度的列表
         """高斯滤波算法"""
@@ -80,4 +81,51 @@ class Bluetooth():
             else:
                 gaussion_filter_num.append(lower_limit)
         gaussion_ave = sum(gaussion_filter_num)/len(gaussion_filter_num)
-        return gaussion_ave
+
+
+test = Bluetooth()
+data = {}
+xd = []
+yd = []
+RSSIa = []
+RSSIb = []
+RSSIc = []
+while( 1 ):
+    scanner = BeaconScanner(scan_base)
+    scanner.start()
+    #将rssi值与mac地址分开
+    flag = 1
+    while( flag ):
+        """传入参数     待改正"""
+        for add in data.keys():
+            if add == u'10:01:12:ee:57:54':
+                RSSIa.append(data[add])
+            elif add == u'20:01:14:9c:57:54':
+                RSSIb.append(data[add])
+            else:
+                RSSIc.append(data[add])
+                #print(len(RSSIc))
+                #print(RSSIc)
+        if len(RSSIa) == 20:
+            flag = 0
+            scanner.stop()
+    ra = test.Gaussion_filter(RSSIa)
+    rb = test.Gaussion_filter(RSSIb)
+    rc = test.Gaussion_filter(RSSIc)
+    # print(ra)
+    # print(rb)
+    # print(rc)
+    r3 = test.RSSI_distance(ra)
+    r1 = test.RSSI_distance(rb)
+    r2 = test.RSSI_distance(rc)
+    # print (r1)
+    # print (r2)
+    # print (r3)
+    coordinate_D = test.fixed_point(test.xc,test.ya,test.yc,r1,r2,r3)
+    #print (coordinate_D)
+    test.coordinate_system_data(coordinate_D)
+    del RSSIa[:]
+    del RSSIb[:]
+    del RSSIc[:]
+    data.clear()
+
