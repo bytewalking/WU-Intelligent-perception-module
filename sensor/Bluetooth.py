@@ -4,14 +4,17 @@ import time
 import math
 import numpy as np
 from beacontools import BeaconScanner
+def scan_base(bt_addr, rssi, packet, additional_info):
+    data[bt_addr] = rssi
+
 class Bluetooth():
     def __init__(self):
         """初始化蓝牙模块"""
-        self.A = int(input("请输发射端和接收端相隔一米时的信号强度，建议程序内部设置"))
-        self.N = int(input("环境衰减因子,建议程序内部设置值"))
-        self.xc = int(input("请输入xc的值"))
-        self.yc = int(input("请输入yc的值"))
-        self.ya = int(input("请输入ya的值"))
+        self.A = 47
+        self.N = 1.7
+        self.xc = 20
+        self.yc = 20
+        self.ya = 40
 
     def fixed_point(self,xc,ya,yc,r1,r2,r3):
         """定位计算模块,r1为BD距离，r2为DC距离，r3为AD距离"""
@@ -19,21 +22,24 @@ class Bluetooth():
         xd = (r1**2-r2**2+xc**2+yc**2-2*yd*yc)/2*xc
         return xd, yd
 
-    def RSSI_distance(self,rssi,A,N):
+    def RSSI_distance(self,rssi):
         """蓝牙RSSI计算距离"""
-        r = 10**((abs(rssi)-A)/10*N)
+        r = 10**((abs(rssi)-self.A)/10*self.N)
         """ A为发射端和接收端相隔一米时的信号强度
             N为环境衰减因子"""
         return r
 
     def CSYS (self,xd,yd,xc,ya,yc):
         """直角坐标系建系及绘图，xd,yd 可以直接传数组"""
+        plt.figure()
         plt.plot(xc, yc, 'or-')
         plt.plot(0, 0, 'or-')
         plt.plot(0, ya, 'or-')
-        plt.figure()
-        plt.plot(xd, yd,'xb-')
+        plt.plot(xd, yd , 'xb')
+        for i in range(len(xd)-2):
+            plt.annotate("", xytext=(xd[i], yd[i]), textcoords='data', xy=(xd[i + 1], yd[i + 1]), xycoords='data',arrowprops=dict(arrowstyle="->", connectionstyle="arc3", ec='y'))
         plt.show()
+
 
     def coordinate_system_data (self,distance):
         """探测坐标数据归类"""
@@ -41,24 +47,13 @@ class Bluetooth():
         global yd
         xd.append(distance[0])
         yd.append(distance[1])
-        self.CSYS(xd,yd,self.xc,self.ya,self.yc)
+        self.CSYS(xd, yd, self.xc, self.ya, self.yc)
 
-    def bluetooch_data(self):
-        """蓝牙模块初始化传入参数"""
-        global data
-        data = {}
-
-        def callback(bt_addr, rssi, packet, additional_info):
-            data[bt_addr] = rssi
-            # print ("<%s, %d> %s %s" % (bt_addr, rssi ,packet, additional_info))
-            # scan for all iBeacon advertisements from beacons with the specified uuid
-
-        while (1):
-            scanner = BeaconScanner(callback)
-            scanner.start()
-            #time.sleep(3)#睡眠时间自定义
-            scanner.stop()
-            return data
+    # def callback(bt_addr, rssi, packet, additional_info):
+    #     """蓝牙模块初始化传入参数"""
+    #     data[bt_addr] = rssi
+    #     #print ("<%s, %d># %s %s" % (bt_addr, rssi ,packet, additional_info))
+    #     #scan for all iBeacon advertisements from beacons with the specified uuid
 
     def Gaussion_filter(self,RSSI): #lists为存放多个节点rssi强度的列表
         """高斯滤波算法"""
@@ -73,42 +68,64 @@ class Bluetooth():
         standard_deviation = math.sqrt( rssi/len(RSSI) )
         """高斯滤波"""
         for j in range(len(RSSI)-1):
-            value = ((math.exp((-((RSSI[j] - ave) ** 2) / (2 * standard_deviation ** 2)))) / standard_deviation * (
-                math.sqrt(2 * math.pi)))
-            gaussion_filter_num.append(value)
-        gaussion_ave=sum(gaussion_filter_num)/len(gaussion_filter_num)
-        return gaussion_ave
+            try:
+                value = ((math.exp((-((RSSI[j] - ave) ** 2) / (2 * standard_deviation ** 2)))) / standard_deviation * (math.sqrt(2 * math.pi)))
+            except ZeroDivisionError:
+                pass
+                upper_limit = ave+value*standard_deviation
+                lower_limit = ave-value*standard_deviation
+            if upper_limit > RSSI[j] and lower_limit<RSSI[j]:
+                gaussion_filter_num.append(RSSI[j])
+            elif upper_limit < RSSI[j]:
+                gaussion_filter_num.append(upper_limit)
+            else:
+                gaussion_filter_num.append(lower_limit)
+        gaussion_ave = sum(gaussion_filter_num)/len(gaussion_filter_num)
 
-    def add(self):
-        while( 1 ):
-            data = self.bluetooch_data()
-            RSSIa = []
-            RSSIb = []
-            RSSIc = []
-            #将rssi值与mac地址分开
-            for rssi in data.values():
-                for add in data.keys():
-                    if add == u'10:01:12:ee:57:54':
-                        RSSIa.append(rssi)
-                    elif add == u'20:01:14:9c:57:54':
-                        RSSIb.append(rssi)
-                    else:
-                        RSSIc.append(rssi)
-            if len(RSSIa)==20 and len(RSSIb)==20 and len(RSSIc)==20 :
-                self.scanner.stop()
-            ra = self.Gaussion_filter(RSSIa)
-            rb = self.Gaussion_filter(RSSIb)
-            rc = self.Gaussion_filter(RSSIc)
-            r3 = self.RSSI_distance(ra, 47, 1.7)
-            r1 = self.RSSI_distance(rb, 47, 1.7)
-            r2 = self.RSSI_distance(rc, 47, 1.7)
-            coordinate_D = self.fixed_point(self.xc,self.ya,self.yc,r1,r2,r3)
-            self.coordinate_system_data(coordinate_D)
-            del RSSIa[:]
-            del RSSIb[:]
-            del RSSIc[:]
 
 test = Bluetooth()
+data = {}
 xd = []
 yd = []
-test.add()
+RSSIa = []
+RSSIb = []
+RSSIc = []
+while( 1 ):
+    scanner = BeaconScanner(scan_base)
+    scanner.start()
+    #将rssi值与mac地址分开
+    flag = 1
+    while( flag ):
+        """传入参数     待改正"""
+        for add in data.keys():
+            if add == u'10:01:12:ee:57:54':
+                RSSIa.append(data[add])
+            elif add == u'20:01:14:9c:57:54':
+                RSSIb.append(data[add])
+            else:
+                RSSIc.append(data[add])
+                #print(len(RSSIc))
+                #print(RSSIc)
+        if len(RSSIa) == 20:
+            flag = 0
+            scanner.stop()
+    ra = test.Gaussion_filter(RSSIa)
+    rb = test.Gaussion_filter(RSSIb)
+    rc = test.Gaussion_filter(RSSIc)
+    # print(ra)
+    # print(rb)
+    # print(rc)
+    r3 = test.RSSI_distance(ra)
+    r1 = test.RSSI_distance(rb)
+    r2 = test.RSSI_distance(rc)
+    # print (r1)
+    # print (r2)
+    # print (r3)
+    coordinate_D = test.fixed_point(test.xc,test.ya,test.yc,r1,r2,r3)
+    #print (coordinate_D)
+    test.coordinate_system_data(coordinate_D)
+    del RSSIa[:]
+    del RSSIb[:]
+    del RSSIc[:]
+    data.clear()
+
