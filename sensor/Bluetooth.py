@@ -78,7 +78,6 @@ class Bluetooth():
             else:
                 gaussion_filter_num.append(lower_limit)
         gaussion_ave = sum(gaussion_filter_num)/len(gaussion_filter_num)
-        return gaussion_ave
 
 
 test = Bluetooth()
@@ -126,3 +125,4 @@ while( 1 ):
     del RSSIb[:]
     del RSSIc[:]
     data.clear()
+
