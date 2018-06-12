@@ -38,7 +38,8 @@ class Bluetooth():
         plt.plot(xd, yd , 'xb')
         for i in range(len(xd)-2):
             plt.annotate("", xytext=(xd[i], yd[i]), textcoords='data', xy=(xd[i + 1], yd[i + 1]), xycoords='data',arrowprops=dict(arrowstyle="->", connectionstyle="arc3", ec='y'))
-        plt.show()
+        plt.show(block=False)
+        
 
 
     def coordinate_system_data (self,distance):

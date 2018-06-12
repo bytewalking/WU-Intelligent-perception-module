@@ -9,7 +9,7 @@ RSSIa = []
 RSSIb = []
 RSSIc = []
 while( 1 ):
-    scanner = BeaconScanner(callable())
+    scanner = BeaconScanner(scan_base)
     scanner.start()
     #将rssi值与mac地址分开
     flag = 1
