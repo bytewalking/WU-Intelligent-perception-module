@@ -1,37 +1,32 @@
 import time
 import RPi.GPIO as GPIO
-
-GPIO.setmode(GPIO.BCM)  # 使用BCM编码方式
-# 定义引脚
-GPIO_TRIGGER = 23
-GPIO_ECHO = 24
-# 设置引脚为输入和输出
-GPIO.setwarnings(False)
-GPIO.setup(GPIO_TRIGGER, GPIO.OUT)  # Trigger
-GPIO.setup(GPIO_ECHO, GPIO.IN)  # Echo
-
-def dis():  # 测距函数
-    GPIO.output(GPIO_TRIGGER, False)  # 设置trigger为低电平
-    time.sleep(0.5)
-    GPIO.output(GPIO_TRIGGER, True)  # 设置trigger为高电平
-    time.sleep(0.00001)
-    GPIO.output(GPIO_TRIGGER, False)
-    start = time.time()  # 记录发射超声波开始时间
-
-    while GPIO.input(GPIO_ECHO) == 0:
-        start = time.time()
-
-    while GPIO.input(GPIO_ECHO) == 1:
-        stop = time.time()  # 记录接收到超声波时间
-
-    elapsed = stop - start  # 计算一共花费多长时间
-    distance = elapsed * 34300  # 计算距离，就是时间乘以声速
-    distance = distance / 2  # 除以2得到一次的距离而不是来回的距离
-    #print "Distance : %.1fcm" % distance
-    print(float(distance))
-try:  # 用于捕捉异常
-    while True:
-        dis()  # 调用测距函数
-        time.sleep(0.5)
+def checkdist():
+        #发出触发信号
+        GPIO.output(2,GPIO.HIGH)
+        #保持15us的超声波发射，避免能量太低无法返回
+        time.sleep(0.000015)
+        #然后置位2号管脚低电平，即停止发射超声波
+        GPIO.output(2,GPIO.LOW)
+        while not GPIO.input(3):
+                     pass
+        #发现高电平时开时计时
+        t1 = time.time()
+        #如果有检测到反射返回的超声波，那么就持续计时，否则就跳出循环，计时结束
+        while GPIO.input(3):
+                     pass
+        #高电平结束停止计时
+        t2 = time.time()
+        #返回距离，单位为米
+        return (t2-t1)*340/2
+GPIO.setmode(GPIO.BCM)
+#第3号针，GPIO2
+GPIO.setup(2,GPIO.OUT,initial=GPIO.LOW)
+#第5号针，GPIO3 27.
+GPIO.setup(3,GPIO.IN)
+time.sleep(2)
+try:
+        while True:
+                print(float(checkdist))
+                time.sleep(0.5)
 except KeyboardInterrupt:
-    GPIO.cleanup()
+                GPIO.cleanup()
