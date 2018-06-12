@@ -69,9 +69,12 @@ class Bluetooth():
         standard_deviation = math.sqrt( rssi/len(RSSI) )
         """高斯滤波"""
         for j in range(len(RSSI)-1):
-            value = ((math.exp((-((RSSI[j] - ave) ** 2) / (2 * standard_deviation ** 2)))) / standard_deviation * (math.sqrt(2 * math.pi)))
-            upper_limit = ave+value*standard_deviation
-            lower_limit = ave-value*standard_deviation
+            try:
+                value = ((math.exp((-((RSSI[j] - ave) ** 2) / (2 * standard_deviation ** 2)))) / standard_deviation * (math.sqrt(2 * math.pi)))
+            except ZeroDivisionError:
+                pass
+                upper_limit = ave+value*standard_deviation
+                lower_limit = ave-value*standard_deviation
             if upper_limit > RSSI[j] and lower_limit<RSSI[j]:
                 gaussion_filter_num.append(RSSI[j])
             elif upper_limit < RSSI[j]:
