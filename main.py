@@ -1,6 +1,8 @@
 from sensor import Bluetooth
-from sensor import Ultrasonic_1
+from sensor import ultrasonic_1
+from sensor import Gyroscope
 import mpu6050_demo
+
 test = Bluetooth()
 data = {}
 xd = []
