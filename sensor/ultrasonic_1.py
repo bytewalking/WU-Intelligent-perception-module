@@ -50,9 +50,8 @@ def beepAction(secs, sleepsecs, times):
         time.sleep(sleepsecs)
 
  # beepAction(0.02,0.02,30)
-import libbeep
 
 while True:
-    if result<=1
-    libbeep.beepAction(0.05, 0.05, 2)
-    time.sleep(1)
+    if result<=1 :
+        beepAction(0.05, 0.05, 2)
+        time.sleep(1)
