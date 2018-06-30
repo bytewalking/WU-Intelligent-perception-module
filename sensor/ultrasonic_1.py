@@ -31,3 +31,27 @@ try:
                 time.sleep(0.5)
 except KeyboardInterrupt:
                 GPIO.cleanup()
+PIN_NO = 7  # GPIO编号，可自定义
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(PIN_NO, GPIO.OUT)
+
+
+# 哔1次，时长作为参数传递
+def beep(seconds):
+    GPIO.output(PIN_NO, GPIO.HIGH)
+    time.sleep(seconds)
+    GPIO.output(PIN_NO, GPIO.LOW)
+
+# 哔N次，时长、间隔时长、重复次数作为参数传递
+def beepAction(secs, sleepsecs, times):
+    for i in range(times):
+        beep(secs)
+        time.sleep(sleepsecs)
+
+ # beepAction(0.02,0.02,30)
+
+while True:
+    if result<=1 :
+        beepAction(0.05, 0.05, 2)
+        time.sleep(1)
