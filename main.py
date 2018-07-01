@@ -1,19 +1,20 @@
-from sensor import ly
+#encoding:utf-8
 import matplotlib.pyplot as plt
-import _thread
+import threading
 import smbus
 import time
 import math
 import numpy as np
+import RPi.GPIO as GPIO
+from sensor import ly
 from numpy import *
 from beacontools import BeaconScanner
 from multiprocessing import Process
 from sensor import Ultrasonic_bee
-from sensor import Gyroscope
-import mpu6050
-import RPi.GPIO as GPIO
+from sensor import mpu6050
 
-def main_bluetooth():
+
+def main_Buletooth ():
     test = ly.Bluetooth()
     global data
     data = {}
@@ -68,6 +69,7 @@ def main_bluetooth():
         del RSSIc[:]
         data.clear()
 
+
 def main_mpu6050():
     #calibration
     calGyroX = -0.3828125
@@ -94,7 +96,6 @@ def main_mpu6050():
     FS_SEL=1 => +/-500degree/s
     FS_SEL=2 => +/-1000degree/s
     FS_SEL=3 => +/-2000degree/s
-    
     AFS_SEL=0 => +/-2g
     AFS_SEL=1 => +/-4g
     AFS_SEL=2 => +/-8g
@@ -102,10 +103,8 @@ def main_mpu6050():
     '''
     GYRO_CONFIG = bus.read_byte_data(address, 0x1B)
     bus.write_byte_data(address, 0x1B, GYRO_CONFIG | (FS_SEL<<3))
-
     ACCEL_CONFIG = bus.read_byte_data(address, 0x1C)
     bus.write_byte_data(address, 0x1C, ACCEL_CONFIG | (AFS_SEL<<3))
-
     i=0
     while (1):
         mpu6050.gyroPrint()
@@ -114,7 +113,8 @@ def main_mpu6050():
         mpu6050.accelerometerPrint()
         i+=1
 
-def main_Ultrasoin_bee():
+
+def main_Ultrasonic_bee():
     GPIO.setmode(GPIO.BCM)
     # 第3号针，GPIO2
     GPIO.setup(27, GPIO.OUT, initial=GPIO.LOW)
@@ -136,6 +136,13 @@ def main_Ultrasoin_bee():
         GPIO.cleanup()
 
 
-_thread.start_new_thread(main_mpu6050())
-_thread.start_new_thread(main_bluetooth())
-_thread.start_new_thread(main_Ultrasoin_bee())
+threads = []
+t1 = threading.Thread(target=main_Buletooth,args=())
+threads.append(t1)
+t2 = threading.Thread(target=main_mpu6050,args=())
+threads.append(t2)
+t3 = threading.Thread(target=main_Ultrasonic_bee,args=())
+threads.append(t3)
+
+for t in threads:
+    t.start()
