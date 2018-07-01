@@ -137,12 +137,12 @@ def main_Ultrasonic_bee():
 
 
 threads = []
-t1 = threading.Thread(target=main_Buletooth,args=())
-threads.append(t1)
 t2 = threading.Thread(target=main_mpu6050,args=())
 threads.append(t2)
 t3 = threading.Thread(target=main_Ultrasonic_bee,args=())
 threads.append(t3)
 
-for t in threads:
-    t.start()
+main_Buletooth()
+while ( 1 ):
+    for t in threads:
+        t.start()
